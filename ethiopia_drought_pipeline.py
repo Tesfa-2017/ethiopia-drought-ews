@@ -25,8 +25,18 @@ def _(mo):
 
 @app.cell
 def _():
-    # Step 1: Verify CUDA GPU Hardware Acceleration
+    # Core imports cell
+    import os
+    import sys
+    import subprocess
+    import shutil
     import torch
+    return os, sys, subprocess, shutil, torch
+
+
+@app.cell
+def _(torch):
+    # Step 1: Verify CUDA GPU Hardware Acceleration
     print("CUDA Available:", torch.cuda.is_available())
     if torch.cuda.is_available():
         print("GPU Device Name:", torch.cuda.get_device_name(0))
@@ -36,13 +46,8 @@ def _():
 
 
 @app.cell
-def _():
+def _(os, sys, subprocess, shutil):
     # Step 2: Auto-sync repository modules (src/ and data/) in MoLab cloud environment
-    import os
-    import sys
-    import subprocess
-    import shutil
-
     if not os.path.exists("src"):
         print("Syncing project files from GitHub into MoLab environment...")
         subprocess.run(["git", "clone", "https://github.com/Tesfa-2017/ethiopia-drought-ews.git", "_repo_tmp"], check=True)
@@ -62,9 +67,8 @@ def _():
 
 
 @app.cell
-def _():
+def _(os):
     # Step 3: Run Full Pipeline Training on GPU
-    import os
     os.environ["MLFLOW_ALLOW_FILE_STORE"] = "true"
 
     from src.train import run_training
