@@ -47,7 +47,14 @@ def _(torch):
 
 @app.cell
 def _(os, sys, subprocess, shutil):
-    # Step 2: Auto-sync repository modules (src/ and data/) in MoLab cloud environment
+    # Step 2: Auto-sync repository modules and ensure matching torchvision/torch installation
+    try:
+        import torchvision
+        import torchvision.ops
+    except Exception as e:
+        print(f"Aligning torch & torchvision versions for Python 3.13... ({e})")
+        subprocess.run([sys.executable, "-m", "pip", "install", "-U", "torch", "torchvision"], check=True)
+
     if not os.path.exists("src"):
         print("Syncing project files from GitHub into MoLab environment...")
         subprocess.run(["git", "clone", "https://github.com/Tesfa-2017/ethiopia-drought-ews.git", "_repo_tmp"], check=True)
