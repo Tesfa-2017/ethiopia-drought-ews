@@ -47,13 +47,23 @@ def _(torch):
 
 @app.cell
 def _(os, sys, subprocess, shutil):
-    # Step 2: Auto-sync repository modules and ensure matching torchvision/torch installation
+    # Step 2: Fix MoLab path order & auto-sync repository modules
+    venv_site = "/tmp/uv-venv/lib/python3.13/site-packages"
+    if os.path.exists(venv_site):
+        if venv_site in sys.path:
+            sys.path.remove(venv_site)
+        sys.path.insert(0, venv_site)
+    sys_site = "/usr/local/lib/python3.13/site-packages"
+    if sys_site in sys.path:
+        sys.path.remove(sys_site)
+
+    # Verify torchvision binary compatibility
     try:
         import torchvision
         import torchvision.ops
     except Exception as e:
-        print(f"Aligning torch & torchvision versions for Python 3.13... ({e})")
-        subprocess.run([sys.executable, "-m", "pip", "install", "-U", "torch", "torchvision"], check=True)
+        print(f"Aligning torchvision binary for Python 3.13... ({e})")
+        subprocess.run([sys.executable, "-m", "pip", "install", "--force-reinstall", "torchvision", "--no-deps"], check=True)
 
     if not os.path.exists("src"):
         print("Syncing project files from GitHub into MoLab environment...")

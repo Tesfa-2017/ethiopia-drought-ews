@@ -6,6 +6,17 @@ and evaluates Full, Partial, or No Activation according to EDRMC guidelines.
 
 import sys
 import os
+
+# Fix MoLab path conflict: Prioritize virtualenv site-packages over system site-packages
+venv_site = "/tmp/uv-venv/lib/python3.13/site-packages"
+if os.path.exists(venv_site):
+    if venv_site in sys.path:
+        sys.path.remove(venv_site)
+    sys.path.insert(0, venv_site)
+sys_site = "/usr/local/lib/python3.13/site-packages"
+if sys_site in sys.path:
+    sys.path.remove(sys_site)
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 import logging
