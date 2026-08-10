@@ -25,33 +25,8 @@ def _(mo):
 
 @app.cell
 def _():
-    # Fast MoLab environment path prioritization & clean import
-    import sys
-    import os
-
-    # Fast O(1) module cache purge
-    for k in ["torch", "torchvision", "torchmetrics", "lightning", "terratorch"]:
-        sys.modules.pop(k, None)
-
-    venv_site = "/tmp/uv-venv/lib/python3.13/site-packages"
-    if os.path.exists(venv_site):
-        if venv_site in sys.path:
-            sys.path.remove(venv_site)
-        sys.path.insert(0, venv_site)
-
-    sys_site = "/usr/local/lib/python3.13/site-packages"
-    if sys_site in sys.path:
-        sys.path.remove(sys_site)
-
-    import subprocess
-    import shutil
-    import torch
-    return os, sys, subprocess, shutil, torch
-
-
-@app.cell
-def _(torch):
     # Step 1: Verify CUDA GPU Hardware Acceleration
+    import torch
     print("CUDA Available:", torch.cuda.is_available())
     if torch.cuda.is_available():
         print("GPU Device Name:", torch.cuda.get_device_name(0))
@@ -61,31 +36,18 @@ def _(torch):
 
 
 @app.cell
-def _(os, sys, subprocess, shutil):
-    # Step 2: Purge system torchvision & fix MoLab path order
-    for mod in list(sys.modules.keys()):
-        if mod == "torchvision" or mod.startswith("torchvision."):
-            del sys.modules[mod]
+def _():
+    # Step 2: Auto-sync repository modules (src/ and data/) in MoLab environment
+    import os
+    import sys
+    import subprocess
+    import shutil
 
     venv_site = "/tmp/uv-venv/lib/python3.13/site-packages"
     if os.path.exists(venv_site):
         if venv_site in sys.path:
             sys.path.remove(venv_site)
         sys.path.insert(0, venv_site)
-    sys_site = "/usr/local/lib/python3.13/site-packages"
-    if sys_site in sys.path:
-        sys.path.remove(sys_site)
-
-    # Verify torchvision binary compatibility
-    try:
-        import torchvision
-        import torchvision.ops
-    except Exception as e:
-        print(f"Aligning torchvision binary for Python 3.13... ({e})")
-        subprocess.run([sys.executable, "-m", "pip", "install", "--force-reinstall", "--no-cache-dir", "torchvision"], check=True)
-        for mod in list(sys.modules.keys()):
-            if mod == "torchvision" or mod.startswith("torchvision."):
-                del sys.modules[mod]
 
     if not os.path.exists("src"):
         print("Syncing project files from GitHub into MoLab environment...")
@@ -106,8 +68,21 @@ def _(os, sys, subprocess, shutil):
 
 
 @app.cell
-def _(os):
+def _():
     # Step 3: Run Full Pipeline Training on GPU
+    import os
+    import sys
+
+    venv_site = "/tmp/uv-venv/lib/python3.13/site-packages"
+    if os.path.exists(venv_site):
+        if venv_site in sys.path:
+            sys.path.remove(venv_site)
+        sys.path.insert(0, venv_site)
+
+    curr_dir = os.path.abspath(".")
+    if curr_dir not in sys.path:
+        sys.path.insert(0, curr_dir)
+
     os.environ["MLFLOW_ALLOW_FILE_STORE"] = "true"
 
     from src.train import run_training
@@ -121,6 +96,19 @@ def _(os):
 @app.cell
 def _(best_ckpt_path):
     # Step 4: Run EDRMC Zonal Risk Evaluation & Inference
+    import os
+    import sys
+
+    venv_site = "/tmp/uv-venv/lib/python3.13/site-packages"
+    if os.path.exists(venv_site):
+        if venv_site in sys.path:
+            sys.path.remove(venv_site)
+        sys.path.insert(0, venv_site)
+
+    curr_dir = os.path.abspath(".")
+    if curr_dir not in sys.path:
+        sys.path.insert(0, curr_dir)
+
     from src.inference import run_inference_and_edrmc_eval
 
     print("Evaluating EDRMC Zonal Drought Risk Activation Status...")
