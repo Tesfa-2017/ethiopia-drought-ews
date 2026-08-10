@@ -14,13 +14,12 @@ checkpoints/
 mlruns/
 *.log
 
-# Large Datasets & Outputs
-data/
+# Large Generated Datasets & Outputs (Ignore large netcdf/rasters, KEEP official admin boundary shapefiles)
+data/*
+!data/eth_admin_boundaries/
+!data/eth_admin_boundaries/**
 *.nc
 *.zarr
-
-# Screenshots / Images (Optional - omit if you want images tracked)
-# *.png
 
 # Python & Virtual Environments
 __pycache__/
