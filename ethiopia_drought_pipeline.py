@@ -26,10 +26,10 @@ def _(mo):
 @app.cell
 def _():
     # Step 1: Verify CUDA GPU Hardware Acceleration
-    import torch
-    print("CUDA Available:", torch.cuda.is_available())
-    if torch.cuda.is_available():
-        print("GPU Device Name:", torch.cuda.get_device_name(0))
+    import torch as _torch
+    print("CUDA Available:", _torch.cuda.is_available())
+    if _torch.cuda.is_available():
+        print("GPU Device Name:", _torch.cuda.get_device_name(0))
     else:
         print("Running on CPU. Ensure GPU accelerator is enabled in Runtime settings.")
     return
@@ -38,52 +38,52 @@ def _():
 @app.cell
 def _():
     # Step 2: Auto-sync repository modules (src/ and data/) in MoLab environment
-    import os
-    import sys
-    import subprocess
-    import shutil
+    import os as _os
+    import sys as _sys
+    import subprocess as _subprocess
+    import shutil as _shutil
 
-    venv_site = "/tmp/uv-venv/lib/python3.13/site-packages"
-    if os.path.exists(venv_site):
-        if venv_site in sys.path:
-            sys.path.remove(venv_site)
-        sys.path.insert(0, venv_site)
+    _venv_site = "/tmp/uv-venv/lib/python3.13/site-packages"
+    if _os.path.exists(_venv_site):
+        if _venv_site in _sys.path:
+            _sys.path.remove(_venv_site)
+        _sys.path.insert(0, _venv_site)
 
-    if not os.path.exists("src"):
+    if not _os.path.exists("src"):
         print("Syncing project files from GitHub into MoLab environment...")
-        subprocess.run(["git", "clone", "https://github.com/Tesfa-2017/ethiopia-drought-ews.git", "_repo_tmp"], check=True)
-        if os.path.exists("_repo_tmp/src"):
-            shutil.copytree("_repo_tmp/src", "src", dirs_exist_ok=True)
-        if os.path.exists("_repo_tmp/data"):
-            shutil.copytree("_repo_tmp/data", "data", dirs_exist_ok=True)
-        shutil.rmtree("_repo_tmp")
+        _subprocess.run(["git", "clone", "https://github.com/Tesfa-2017/ethiopia-drought-ews.git", "_repo_tmp"], check=True)
+        if _os.path.exists("_repo_tmp/src"):
+            _shutil.copytree("_repo_tmp/src", "src", dirs_exist_ok=True)
+        if _os.path.exists("_repo_tmp/data"):
+            _shutil.copytree("_repo_tmp/data", "data", dirs_exist_ok=True)
+        _shutil.rmtree("_repo_tmp")
         print("Project modules (src/ & data/) synced successfully!")
     else:
         print("src/ module directory verified.")
 
-    curr_dir = os.path.abspath(".")
-    if curr_dir not in sys.path:
-        sys.path.insert(0, curr_dir)
+    _curr_dir = _os.path.abspath(".")
+    if _curr_dir not in _sys.path:
+        _sys.path.insert(0, _curr_dir)
     return
 
 
 @app.cell
 def _():
     # Step 3: Run Full Pipeline Training on GPU
-    import os
-    import sys
+    import os as _os
+    import sys as _sys
 
-    venv_site = "/tmp/uv-venv/lib/python3.13/site-packages"
-    if os.path.exists(venv_site):
-        if venv_site in sys.path:
-            sys.path.remove(venv_site)
-        sys.path.insert(0, venv_site)
+    _venv_site = "/tmp/uv-venv/lib/python3.13/site-packages"
+    if _os.path.exists(_venv_site):
+        if _venv_site in _sys.path:
+            _sys.path.remove(_venv_site)
+        _sys.path.insert(0, _venv_site)
 
-    curr_dir = os.path.abspath(".")
-    if curr_dir not in sys.path:
-        sys.path.insert(0, curr_dir)
+    _curr_dir = _os.path.abspath(".")
+    if _curr_dir not in _sys.path:
+        _sys.path.insert(0, _curr_dir)
 
-    os.environ["MLFLOW_ALLOW_FILE_STORE"] = "true"
+    _os.environ["MLFLOW_ALLOW_FILE_STORE"] = "true"
 
     from src.train import run_training
 
@@ -96,18 +96,18 @@ def _():
 @app.cell
 def _(best_ckpt_path):
     # Step 4: Run EDRMC Zonal Risk Evaluation & Inference
-    import os
-    import sys
+    import os as _os
+    import sys as _sys
 
-    venv_site = "/tmp/uv-venv/lib/python3.13/site-packages"
-    if os.path.exists(venv_site):
-        if venv_site in sys.path:
-            sys.path.remove(venv_site)
-        sys.path.insert(0, venv_site)
+    _venv_site = "/tmp/uv-venv/lib/python3.13/site-packages"
+    if _os.path.exists(_venv_site):
+        if _venv_site in _sys.path:
+            _sys.path.remove(_venv_site)
+        _sys.path.insert(0, _venv_site)
 
-    curr_dir = os.path.abspath(".")
-    if curr_dir not in sys.path:
-        sys.path.insert(0, curr_dir)
+    _curr_dir = _os.path.abspath(".")
+    if _curr_dir not in _sys.path:
+        _sys.path.insert(0, _curr_dir)
 
     from src.inference import run_inference_and_edrmc_eval
 
