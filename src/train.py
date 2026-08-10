@@ -14,8 +14,12 @@ if os.path.exists(venv_site):
         sys.path.remove(venv_site)
     sys.path.insert(0, venv_site)
 
-# 2. Filter out conflicting system /usr/local/lib site-packages from sys.path
-sys.path = [p for p in sys.path if "/usr/local/lib" not in p or p == venv_site]
+# 2. Keep system site-packages at the end of sys.path for pre-installed fallback packages (lightning, etc.)
+sys_site = "/usr/local/lib/python3.13/site-packages"
+if os.path.exists(sys_site):
+    if sys_site in sys.path:
+        sys.path.remove(sys_site)
+    sys.path.append(sys_site)
 
 # Verify & force install matching torchvision binary if needed
 try:

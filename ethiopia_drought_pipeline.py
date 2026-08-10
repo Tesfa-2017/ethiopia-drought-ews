@@ -79,7 +79,11 @@ def _():
             _sys.path.remove(_venv_site)
         _sys.path.insert(0, _venv_site)
 
-    _sys.path = [p for p in _sys.path if "/usr/local/lib" not in p or p == _venv_site]
+    _sys_site = "/usr/local/lib/python3.13/site-packages"
+    if _os.path.exists(_sys_site):
+        if _sys_site in _sys.path:
+            _sys.path.remove(_sys_site)
+        _sys.path.append(_sys_site)
 
     _curr_dir = _os.path.abspath(".")
     if _curr_dir not in _sys.path:
