@@ -47,7 +47,11 @@ def _(torch):
 
 @app.cell
 def _(os, sys, subprocess, shutil):
-    # Step 2: Fix MoLab path order & auto-sync repository modules
+    # Step 2: Purge system torchvision & fix MoLab path order
+    for mod in list(sys.modules.keys()):
+        if mod == "torchvision" or mod.startswith("torchvision."):
+            del sys.modules[mod]
+
     venv_site = "/tmp/uv-venv/lib/python3.13/site-packages"
     if os.path.exists(venv_site):
         if venv_site in sys.path:
@@ -63,7 +67,10 @@ def _(os, sys, subprocess, shutil):
         import torchvision.ops
     except Exception as e:
         print(f"Aligning torchvision binary for Python 3.13... ({e})")
-        subprocess.run([sys.executable, "-m", "pip", "install", "--force-reinstall", "torchvision", "--no-deps"], check=True)
+        subprocess.run([sys.executable, "-m", "pip", "install", "--force-reinstall", "--no-cache-dir", "torchvision"], check=True)
+        for mod in list(sys.modules.keys()):
+            if mod == "torchvision" or mod.startswith("torchvision."):
+                del sys.modules[mod]
 
     if not os.path.exists("src"):
         print("Syncing project files from GitHub into MoLab environment...")

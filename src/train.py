@@ -5,6 +5,12 @@ Integrates MLflow Logging, Early Stopping, Model Checkpoint, and Mixed Precision
 
 import sys
 import os
+import subprocess
+
+# Purge cached broken system torchvision from sys.modules
+for mod in list(sys.modules.keys()):
+    if mod == "torchvision" or mod.startswith("torchvision."):
+        del sys.modules[mod]
 
 # Fix MoLab path conflict: Prioritize virtualenv site-packages over system site-packages
 venv_site = "/tmp/uv-venv/lib/python3.13/site-packages"
@@ -15,6 +21,17 @@ if os.path.exists(venv_site):
 sys_site = "/usr/local/lib/python3.13/site-packages"
 if sys_site in sys.path:
     sys.path.remove(sys_site)
+
+# Verify & force install matching torchvision binary if needed
+try:
+    import torchvision
+    import torchvision.ops
+except Exception as e:
+    print(f"Force aligning torchvision for Python 3.13... ({e})")
+    subprocess.run([sys.executable, "-m", "pip", "install", "--force-reinstall", "--no-cache-dir", "torchvision"], check=True)
+    for mod in list(sys.modules.keys()):
+        if mod == "torchvision" or mod.startswith("torchvision."):
+            del sys.modules[mod]
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
