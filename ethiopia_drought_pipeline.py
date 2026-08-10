@@ -45,8 +45,22 @@ def _():
 
 @app.cell
 def _():
-    # Step 2: Install Required Dependencies
-    # packages added via marimo's package management: terratorch torchgeo earthengine-api geemap geedim xarray rioxarray netcdf4 huggingface_hub mlflow pytorch-lightning scikit-learn pandas scipy dask matplotlib torchmetrics !pip install -q terratorch torchgeo earthengine-api geemap geedim xarray rioxarray netcdf4 huggingface_hub mlflow pytorch-lightning scikit-learn pandas scipy dask matplotlib torchmetrics
+    # Step 2.5: Auto-clone repository modules (src/ & data/) if running in cloud MoLab environment
+    import os
+    import subprocess
+    import shutil
+
+    if not os.path.exists("src"):
+        print("Syncing project files from GitHub...")
+        subprocess.run(["git", "clone", "https://github.com/Tesfa-2017/ethiopia-drought-ews.git", "_repo_tmp"], check=True)
+        if os.path.exists("_repo_tmp/src"):
+            shutil.copytree("_repo_tmp/src", "src", dirs_exist_ok=True)
+        if os.path.exists("_repo_tmp/data"):
+            shutil.copytree("_repo_tmp/data", "data", dirs_exist_ok=True)
+        shutil.rmtree("_repo_tmp")
+        print("Project modules (src/ & data/) synced successfully!")
+    else:
+        print("src/ module directory verified.")
     return
 
 
