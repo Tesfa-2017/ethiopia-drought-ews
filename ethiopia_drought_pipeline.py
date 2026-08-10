@@ -25,9 +25,29 @@ def _(mo):
 
 @app.cell
 def _():
-    # Core imports cell
-    import os
+    # Core imports cell with MoLab path priority & module cache purge
     import sys
+    import os
+
+    for mod_name, mod in list(sys.modules.items()):
+        try:
+            if hasattr(mod, "__file__") and mod.__file__ and "/usr/local/lib" in mod.__file__:
+                del sys.modules[mod_name]
+            elif mod_name.startswith(("torch", "torchvision", "torchmetrics", "lightning", "terratorch")):
+                del sys.modules[mod_name]
+        except Exception:
+            pass
+
+    venv_site = "/tmp/uv-venv/lib/python3.13/site-packages"
+    if os.path.exists(venv_site):
+        if venv_site in sys.path:
+            sys.path.remove(venv_site)
+        sys.path.insert(0, venv_site)
+
+    sys_site = "/usr/local/lib/python3.13/site-packages"
+    if sys_site in sys.path:
+        sys.path.remove(sys_site)
+
     import subprocess
     import shutil
     import torch

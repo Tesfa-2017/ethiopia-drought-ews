@@ -5,12 +5,16 @@ Integrates MLflow Logging, Early Stopping, Model Checkpoint, and Mixed Precision
 
 import sys
 import os
-import subprocess
 
-# Purge cached broken system torchvision from sys.modules
-for mod in list(sys.modules.keys()):
-    if mod == "torchvision" or mod.startswith("torchvision."):
-        del sys.modules[mod]
+# Purge any system site-packages modules from sys.modules
+for mod_name, mod in list(sys.modules.items()):
+    try:
+        if hasattr(mod, "__file__") and mod.__file__ and "/usr/local/lib" in mod.__file__:
+            del sys.modules[mod_name]
+        elif mod_name.startswith(("torch", "torchvision", "torchmetrics", "lightning", "terratorch")):
+            del sys.modules[mod_name]
+    except Exception:
+        pass
 
 # Fix MoLab path conflict: Prioritize virtualenv site-packages over system site-packages
 venv_site = "/tmp/uv-venv/lib/python3.13/site-packages"
