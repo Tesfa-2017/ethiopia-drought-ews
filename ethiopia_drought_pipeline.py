@@ -11,29 +11,21 @@ app = marimo.App()
 @app.cell
 def _():
     import marimo as mo
-
     return (mo,)
-
-
-@app.cell
-def _():
-    import subprocess
-
-    return (subprocess,)
 
 
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
     # Prithvi WxC Drought Prediction Pipeline for Ethiopia (GPU Accelerated)
-    This notebook trains the Prithvi WxC foundation model fine-tuned for SPI-3 drought prediction over Ethiopia on a GPU (NVIDIA RTX Pro 6000 / T4 / A100).
+    This notebook trains the IBM/NASA Prithvi WxC foundation model fine-tuned for SPI-3 drought prediction over Ethiopia on a GPU (NVIDIA RTX / T4 / A100 / L4).
     """)
     return
 
 
 @app.cell
 def _():
-    # Step 1: Verify CUDA GPU Acceleration
+    # Step 1: Verify CUDA GPU Hardware Acceleration
     import torch
     print("CUDA Available:", torch.cuda.is_available())
     if torch.cuda.is_available():
@@ -45,13 +37,14 @@ def _():
 
 @app.cell
 def _():
-    # Step 2.5: Auto-clone repository modules (src/ & data/) if running in cloud MoLab environment
+    # Step 2: Auto-sync repository modules (src/ and data/) in MoLab cloud environment
     import os
+    import sys
     import subprocess
     import shutil
 
     if not os.path.exists("src"):
-        print("Syncing project files from GitHub...")
+        print("Syncing project files from GitHub into MoLab environment...")
         subprocess.run(["git", "clone", "https://github.com/Tesfa-2017/ethiopia-drought-ews.git", "_repo_tmp"], check=True)
         if os.path.exists("_repo_tmp/src"):
             shutil.copytree("_repo_tmp/src", "src", dirs_exist_ok=True)
@@ -61,27 +54,35 @@ def _():
         print("Project modules (src/ & data/) synced successfully!")
     else:
         print("src/ module directory verified.")
+
+    curr_dir = os.path.abspath(".")
+    if curr_dir not in sys.path:
+        sys.path.insert(0, curr_dir)
     return
 
 
 @app.cell
-def _(subprocess):
+def _():
     # Step 3: Run Full Pipeline Training on GPU
     import os
     os.environ["MLFLOW_ALLOW_FILE_STORE"] = "true"
 
-    # Run fine-tuning training loop
-    #! python src/train.py
-    subprocess.call(['python', 'src/train.py'])
-    return
+    from src.train import run_training
+
+    print("Starting Prithvi WxC Fine-Tuning Training Loop...")
+    best_ckpt_path = run_training()
+    print(f"Training completed! Best checkpoint: {best_ckpt_path}")
+    return (best_ckpt_path,)
 
 
 @app.cell
-def _(subprocess):
+def _(best_ckpt_path):
     # Step 4: Run EDRMC Zonal Risk Evaluation & Inference
-    #! python src/inference.py
-    subprocess.call(['python', 'src/inference.py'])
-    return
+    from src.inference import run_inference_and_edrmc_eval
+
+    print("Evaluating EDRMC Zonal Drought Risk Activation Status...")
+    df_results = run_inference_and_edrmc_eval()
+    return (df_results,)
 
 
 if __name__ == "__main__":
