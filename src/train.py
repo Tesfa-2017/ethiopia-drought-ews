@@ -7,20 +7,15 @@ import sys
 import os
 import subprocess
 
-# 1. Purge any cached torch modules from sys.modules
-for mod_name in list(sys.modules.keys()):
-    if mod_name == "torch" or mod_name.startswith("torch."):
-        del sys.modules[mod_name]
-
-# 2. Completely filter out system /usr/local/lib site-packages from sys.path
-sys.path = [p for p in sys.path if "/usr/local/lib" not in p]
-
-# 3. Prioritize virtualenv site-packages at position 0
+# 1. Prioritize virtualenv site-packages at position 0
 venv_site = "/tmp/uv-venv/lib/python3.13/site-packages"
 if os.path.exists(venv_site):
     if venv_site in sys.path:
         sys.path.remove(venv_site)
     sys.path.insert(0, venv_site)
+
+# 2. Filter out conflicting system /usr/local/lib site-packages from sys.path
+sys.path = [p for p in sys.path if "/usr/local/lib" not in p or p == venv_site]
 
 # Verify & force install matching torchvision binary if needed
 try:
