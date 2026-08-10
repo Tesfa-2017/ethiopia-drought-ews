@@ -240,6 +240,13 @@ def run_inference_and_edrmc_eval():
     except Exception as e:
         logger.warning(f"Could not overwrite {geotiff_prob_file} ({e}). File is currently open in QGIS.")
 
+    # Step 7: Run Official Ethiopian Administrative Boundary Evaluation (Regions, Zones, Woredas)
+    try:
+        from src.official_zonal_stats import run_all_official_zonal_evaluations
+        run_all_official_zonal_evaluations()
+    except Exception as e:
+        logger.warning(f"Could not run official administrative shapefile stats: {e}")
+
     return df_results
 
 
