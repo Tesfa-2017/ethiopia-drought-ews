@@ -73,6 +73,8 @@ def _():
     import os as _os
     import sys as _sys
 
+    _sys.path = [p for p in _sys.path if "/usr/local/lib" not in p]
+
     _venv_site = "/tmp/uv-venv/lib/python3.13/site-packages"
     if _os.path.exists(_venv_site):
         if _venv_site in _sys.path:
