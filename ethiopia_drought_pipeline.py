@@ -61,6 +61,20 @@ def _():
     else:
         print("src/ module directory verified.")
 
+    # Auto-install missing pipeline dependencies (e.g. earthengine-api, terratorch, rioxarray)
+    _req_pkgs = ["earthengine-api", "terratorch", "torchgeo", "geedim", "geemap", "rioxarray", "xarray", "netcdf4", "mlflow"]
+    _missing = []
+    for _pkg in _req_pkgs:
+        _mod_name = "ee" if _pkg == "earthengine-api" else _pkg.replace("-", "_")
+        try:
+            __import__(_mod_name)
+        except ImportError:
+            _missing.append(_pkg)
+
+    if _missing:
+        print(f"Auto-installing missing pipeline dependencies in MoLab: {_missing}...")
+        _subprocess.run([_sys.executable, "-m", "pip", "install", *_missing], check=True)
+
     _curr_dir = _os.path.abspath(".")
     if _curr_dir not in _sys.path:
         _sys.path.insert(0, _curr_dir)

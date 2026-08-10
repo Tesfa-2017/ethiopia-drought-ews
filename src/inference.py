@@ -33,6 +33,20 @@ except Exception as e:
         if mod == "torchvision" or mod.startswith("torchvision."):
             del sys.modules[mod]
 
+# Auto-install missing pipeline dependencies (e.g. earthengine-api, terratorch, rioxarray)
+required_pkgs = ["earthengine-api", "terratorch", "torchgeo", "geedim", "geemap", "rioxarray", "xarray", "netcdf4", "mlflow"]
+missing = []
+for pkg in required_pkgs:
+    mod_name = "ee" if pkg == "earthengine-api" else pkg.replace("-", "_")
+    try:
+        __import__(mod_name)
+    except ImportError:
+        missing.append(pkg)
+
+if missing:
+    print(f"Auto-installing missing pipeline dependencies in MoLab: {missing}...")
+    subprocess.run([sys.executable, "-m", "pip", "install", *missing], check=True)
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 import logging
