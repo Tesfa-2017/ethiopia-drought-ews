@@ -5,6 +5,7 @@ Integrates MLflow Logging, Early Stopping, Model Checkpoint, and Mixed Precision
 
 import sys
 import os
+import subprocess
 
 # Fast O(1) module cache purge
 for k in ["torch", "torchvision", "torchmetrics", "lightning", "terratorch"]:

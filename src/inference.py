@@ -6,6 +6,7 @@ and evaluates Full, Partial, or No Activation according to EDRMC guidelines.
 
 import sys
 import os
+import subprocess
 
 # Fast O(1) module cache purge
 for k in ["torch", "torchvision", "torchmetrics", "lightning", "terratorch"]:
