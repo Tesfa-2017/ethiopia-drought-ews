@@ -1,0 +1,38 @@
+# Build & Run Instructions:
+# Build image:      docker compose build
+# Start pipeline:   docker compose up
+# Run inference:    docker compose exec drought-pipeline python src/inference.py
+
+
+services:
+  drought-pipeline:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ethiopia_drought_pipeline
+    shm_size: '2gb'
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      - GEE_SERVICE_ACCOUNT_KEY=${GEE_SERVICE_ACCOUNT_KEY:-/app/credentials/gee-key.json}
+      - GEE_SERVICE_ACCOUNT_EMAIL=${GEE_SERVICE_ACCOUNT_EMAIL:-}
+      - DATA_DIR=/app/data
+      - CHECKPOINT_DIR=/app/checkpoints
+      - MLFLOW_TRACKING_URI=file:///app/mlruns
+      - MLFLOW_ALLOW_FILE_STORE=true
+      - PYTHONPATH=/app
+    volumes:
+      - ./src:/app/src
+      - ./data:/app/data
+      - ./credentials:/app/credentials
+      - ./mlruns:/app/mlruns
+      - ./checkpoints:/app/checkpoints
+      - C:/Users/HP/.config/earthengine:/root/.config/earthengine
+      # deploy:
+      # resources:
+      #  reservations:
+      #  devices:
+      # - driver: nvidia
+      #count: all
+      #capabilities: [gpu]

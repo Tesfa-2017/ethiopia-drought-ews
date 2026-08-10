@@ -1,0 +1,38 @@
+# Environment & Credentials
+.env
+.env.example
+credentials/
+
+# Checkpoints & Model Weights
+checkpoints/
+*.ckpt
+*.pth
+*.pt
+*.onnx
+
+# MLflow & Experiment Logs
+mlruns/
+*.log
+
+# Large Datasets & Outputs
+data/
+*.nc
+*.zarr
+
+# Screenshots / Images (Optional - omit if you want images tracked)
+# *.png
+
+# Python & Virtual Environments
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+env/
+venv/
+.pytest_cache/
+
+# OS & IDE Files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
